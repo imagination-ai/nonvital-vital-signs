@@ -37,7 +37,6 @@ def get_knowledge_pool_highlights(limit):
 
 @router.get(
     "/last_highlights",
-    tags=["Knowledge Pool Parsing"],
     # TODO: Return Type - responses={}
 )
 async def parse_knowledge_pool(limit: int = 5):
@@ -47,7 +46,6 @@ async def parse_knowledge_pool(limit: int = 5):
 
 @router.get(
     "/last_events",
-    tags=["Get Last Events from Notion"],
 )
 async def parse_events(limit: int = 5):
     url = f"{NOTION_API_BASE_URL}/databases/5d34842a3d1d4ff9962c8559bdf9bd12/query"
