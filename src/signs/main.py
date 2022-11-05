@@ -11,6 +11,7 @@ configure_logging()
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+v1 = FastAPI()
 
 app_settings = SignsAppSettings()
 
@@ -24,12 +25,12 @@ def create_directory(dirs):
             logger.info(f"Skipping creating {directory} since it exists.")
 
 
-@app.on_event("startup")
+@v1.on_event("startup")
 async def startup_event():
     print(app_settings)
 
 
-@app.get("/", tags=["Index"])
+@v1.get("/", tags=["Index"])
 async def index():
     message = "Vital Signs is working! See the docs at /api/v1/docs"
     return {"success": True, "message": message}
@@ -48,4 +49,5 @@ if __name__ == "__main__":
     )
 
 
-app.include_router(notion.router)
+v1.include_router(notion.router)
+app.mount("/api/v1", v1)
