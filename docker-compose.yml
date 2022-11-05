@@ -1,0 +1,64 @@
+version: "3.8"
+services:
+
+  signs:
+    build:
+      context: .
+      target: nonvital-vital-signs
+      dockerfile: Dockerfile
+    image: imagination-ai/nonvital-vital-signs
+    volumes:
+      - ./src/signs:/applications/signs
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    restart: "no"
+    environment:
+      - STORAGE_EMULATOR_HOST=http://mock-cloud-storage:4443
+      - ENVIRONMENT=docker
+      - NOTION_SECRET_OB=""
+    depends_on:
+      - mock-cloud-storage
+    entrypoint: [ "gunicorn", 'signs.main:app', '--reload', '--bind', '0.0.0.0:8000',
+    '--log-level', 'info', '--access-logfile', '-',
+    '-k', 'uvicorn.workers.UvicornWorker',
+    ]
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  mock-cloud-storage:
+    image: fsouza/fake-gcs-server
+    networks:
+      - backend
+    ports:
+      - "4443:4443"
+    volumes:
+      - ./fake-gcs:/data  # bucket
+    command: "-scheme=http"
+  # (TODO: osman) Uncomment when we need it.
+  #localstack:
+    #image: localstack/localstack:0.11.1
+    #networks:
+      #- backend
+    #ports:
+      #- "4566:4566"
+      #- "${PORT_WEB_UI:-8080}:${PORT_WEB_UI:-8080}"
+    #environment:
+      #- SERVICES=sqs,s3
+      #- DOCKER_HOST=unix:///var/run/docker.sock
+      #- DATA_DIR=/tmp/localstack/data
+      #- HOSTNAME_EXTERNAL=localstack
+      #- AWS_REGION=us-east-1
+      #- AWS_DEFAULT_REGION=us-east-1
+      #- AWS_SECRET_ACCESS_KEY=AFakeKey
+      #- AWS_ACESSS_KEY_ID=AFakeId
+      #- DEBUG=${DEBUG- }
+
+networks:
+  backend:
+
+volumes:
+  db-data: {}
