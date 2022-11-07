@@ -1,7 +1,7 @@
 import logging
 import os
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from signs.config import SignsAppSettings
@@ -12,8 +12,7 @@ from signs.routers import notion
 configure_logging()
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
-v1 = FastAPI()
+app = FastAPI(title="Nonvital Vital Signs")
 
 app_settings = SignsAppSettings()
 add_middleware(app)
@@ -31,7 +30,7 @@ app.add_middleware(
 # @app.exception_handler(Exception)
 # def handle_exception(req, exc):
 #     logger.error("Exception occured", exc_info=exc)  # This does not
-#     return {"Hede": 5}
+#     return Response(...)
 
 
 def create_directory(dirs):
@@ -54,8 +53,7 @@ async def index():
     return {"success": True, "message": message}
 
 
-v1.include_router(notion.router)
-app.mount("/api/v1", v1)
+app.include_router(notion.router, prefix="/api/v1")
 
 if __name__ == "__main__":
     import uvicorn

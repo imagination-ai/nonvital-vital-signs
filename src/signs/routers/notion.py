@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter
 from pydantic import BaseModel
 from requests import Session
@@ -44,7 +42,7 @@ def _get_url_from_knowledge_pool_result(result):
     url = ""
     urls = result["properties"]["url"]["rollup"]["array"]
     if len(urls) > 0:
-        url = urls[0]["url"]
+        url = urls[0]["url"] or ""
 
     return url
 
